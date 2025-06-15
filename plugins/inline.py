@@ -55,7 +55,7 @@ async def answer(bot, query):
                 title=file.file_name,
                 document_file_id=file.file_id,
                 caption=caption,
-                parse_mode="MarkdownV2",
+                parse_mode="MarkdownV2",  # ✅ Important
                 description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™",
                 reply_markup=reply_markup
             )
@@ -87,7 +87,7 @@ async def answer(bot, query):
 
 
 def get_reply_markup(username, query):
-    url = 't.me/share/url?url=' + quote(SHARE_BUTTON_TEXT.format(username=username))
+    url = 'https://t.me/share/url?url=' + quote(SHARE_BUTTON_TEXT.format(username=username))
     buttons = [
         [
             InlineKeyboardButton('Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ🔎', switch_inline_query_current_chat=query),
@@ -119,6 +119,6 @@ async def is_subscribed(bot, query):
     except Exception as e:
         logger.exception(e)
     else:
-        if not user.status == 'kicked':
+        if user.status != 'kicked':
             return True
     return False
