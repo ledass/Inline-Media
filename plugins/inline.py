@@ -42,11 +42,11 @@ async def answer(bot, query):
         escaped_filename = escape_markdown_v2(file.file_name)
         escaped_size = escape_markdown_v2(size_formatter(file.file_size))
 
-        caption = (
-            "*| Kuttu Bot 2 ™ |*\n"
-            f"📁 *File Name:* {escaped_filename}\n"
-            f"📦 *File Size:* {escaped_size}\n\n"
-            "Free Movie Group 🎬 \\- \\|\\|\\|@wudixh\\|\\|\\|"
+        caption = caption = (
+            "* Kuttu Bot 2 ™ *\n"
+            f"📁 *File Name:* {escape_markdown_v2(file.file_name)}\n"
+            f"📦 *File Size:* {escape_markdown_v2(size_formatter(file.file_size))}\n\n"
+            "Free Movie Group 🎬 @wudixh"
         )
 
         results.append(
