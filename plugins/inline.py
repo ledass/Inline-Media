@@ -4,6 +4,7 @@ from urllib.parse import quote
 from pyrogram import Client, filters
 from pyrogram.errors import UserNotParticipant
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultCachedDocument
+from pyrogram.enums import ParseMode
 
 from utils import get_search_results
 from info import CACHE_TIME, SHARE_BUTTON_TEXT, AUTH_USERS, AUTH_CHANNEL
@@ -20,8 +21,8 @@ async def answer(bot, query):
         await query.answer(
             results=[],
             cache_time=0,
-            switch_pm_text='Yᴏᴜ Hᴀᴠᴇ Tᴏ SᴜʙSᴄʀɪʙᴇ Cʜᴀɴɴᴇʟ...✔',
-            switch_pm_parameter="Sᴜʙsᴄʀɪʙᴇ...💖",
+            switch_pm_text='You have to subscribe the channel ✔',
+            switch_pm_parameter="subscribe",
         )
         return
 
@@ -39,14 +40,11 @@ async def answer(bot, query):
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
     for file in files:
-        escaped_filename = escape_markdown_v2(file.file_name)
-        escaped_size = escape_markdown_v2(size_formatter(file.file_size))
-
-        caption = caption = (
-            "* Kuttu Bot 2 ™ *\n"
-            f"📁 *File Name:* {escape_markdown_v2(file.file_name)}\n"
-            f"📦 *File Size:* {escape_markdown_v2(size_formatter(file.file_size))}\n\n"
-            "Free Movie Group 🎬 @wudixh"
+        caption = (
+            "<b>| Kuttu Bot 2 ™ |</b>\n"
+            f"📁 <b>File Name:</b> {escape_html(file.file_name)}\n"
+            f"📦 <b>File Size:</b> {escape_html(size_formatter(file.file_size))}\n\n"
+            "Free Movie Group 🎬 <a href='https://t.me/wudixh'>@wudixh</a>"
         )
 
         results.append(
@@ -54,14 +52,14 @@ async def answer(bot, query):
                 title=file.file_name,
                 document_file_id=file.file_id,
                 caption=caption,
-                parse_mode="MarkdownV2",
-                description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™",
+                parse_mode="HTML",
+                description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kuttu Bot 2 ™",
                 reply_markup=reply_markup
             )
         )
 
     if results:
-        switch_pm_text = f"📁Rᴇsᴜʟᴛz📁"
+        switch_pm_text = "📁Results📁"
         if text:
             switch_pm_text += f" for {text}"
 
@@ -73,7 +71,7 @@ async def answer(bot, query):
             next_offset=str(next_offset)
         )
     else:
-        switch_pm_text = f"❌No Rᴇsᴜʟᴛz❌"
+        switch_pm_text = "❌No Results❌"
         if text:
             switch_pm_text += f' for "{text}"'
 
@@ -89,11 +87,11 @@ def get_reply_markup(username, query):
     url = 'https://t.me/share/url?url=' + quote(SHARE_BUTTON_TEXT.format(username=username))
     buttons = [
         [
-            InlineKeyboardButton('Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ🔎', switch_inline_query_current_chat=query),
-            InlineKeyboardButton('Sʜᴀʀᴇ ʙᴏᴛ💕', url=url)
+            InlineKeyboardButton('Search again 🔎', switch_inline_query_current_chat=query),
+            InlineKeyboardButton('Share bot 💕', url=url)
         ],
         [
-            InlineKeyboardButton('Dᴇᴠᴇʟᴏᴘᴇʀ😎', url="https://telegram.dog/wudixh13/4")
+            InlineKeyboardButton('Developer 😎', url="https://telegram.dog/wudixh13/4")
         ]
     ]
     return InlineKeyboardMarkup(buttons)
@@ -110,10 +108,13 @@ def size_formatter(size):
     return "%.2f %s" % (size, units[i])
 
 
-def escape_markdown_v2(text):
-    """Escape characters for MarkdownV2"""
-    escape_chars = r"_\*[]()~`>#+-=|{}.! "
-    return ''.join(f"\\{c}" if c in escape_chars else c for c in text)
+def escape_html(text):
+    """Escape characters for HTML"""
+    return (text
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            )
 
 
 async def is_subscribed(bot, query):
