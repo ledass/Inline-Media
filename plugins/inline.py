@@ -39,34 +39,33 @@ async def answer(bot, query):
     reply_markup = get_reply_markup(bot.username, query=text)
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
-    
-   for file in files:
-       escaped_filename = escape_markdown(file.file_name, version=2)
-       escaped_size = escape_markdown(size_formatter(file.file_size), version=2)
+    for file in files:
+        escaped_filename = escape_markdown(file.file_name, version=2)
+        escaped_size = escape_markdown(size_formatter(file.file_size), version=2)
 
-    caption = (
-        "*| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |*\n"
-        f"📁 *Fɪʟᴇ Nᴀᴍᴇ:* {escaped_filename}\n\n"
-        f"📽 *Fɪʟᴇ Sɪᴢᴇ:* {escaped_size}\n\n"
-        "Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬\\- ||@wudixh||"
-    )
-
-    description = (
-        f"Size: {size_formatter(file.file_size)}\n"
-        f"Type: {file.file_type}\n"
-        "© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™"
-    )
-
-    results.append(
-        InlineQueryResultCachedDocument(
-            title=file.file_name,
-            document_file_id=file.file_id,
-            caption=caption,
-            parse_mode="MarkdownV2",
-            description=description,
-            reply_markup=reply_markup
+        caption = (
+            "*| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |*\n"
+            f"📁 *Fɪʟᴇ Nᴀᴍᴇ:* {escaped_filename}\n\n"
+            f"📽 *Fɪʟᴇ Sɪᴢᴇ:* {escaped_size}\n\n"
+            "Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬\\- \\|\\|@wudixh\\|\\|"
         )
-    )
+
+        description = escape_markdown(
+            f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\nKᴜᴛᴛᴜ Bᴏᴛ 2 ™",
+            version=2
+        )
+
+        results.append(
+            InlineQueryResultCachedDocument(
+                title=file.file_name,
+                document_file_id=file.file_id,
+                caption=caption,
+                parse_mode="MarkdownV2",  # Important!
+                description=description,
+                reply_markup=reply_markup
+            )
+        )
+
     if results:
         switch_pm_text = f"📁Rᴇsᴜʟᴛz📁"
         if text:
@@ -80,7 +79,6 @@ async def answer(bot, query):
             next_offset=str(next_offset)
         )
     else:
-
         switch_pm_text = f"❌No Rᴇsᴜʟᴛz❌"
         if text:
             switch_pm_text += f' for "{text}"'
@@ -96,18 +94,16 @@ async def answer(bot, query):
 def get_reply_markup(username, query):
     url = 't.me/share/url?url=' + quote(SHARE_BUTTON_TEXT.format(username=username))
     buttons = [[
-            InlineKeyboardButton('Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ🔎', switch_inline_query_current_chat=query),
-            InlineKeyboardButton('Sʜᴀʀᴇ ʙᴏᴛ💕', url=url)
-        ],[
-            InlineKeyboardButton('Dᴇᴠᴇʟᴏᴘᴇʀ😎', url=f"https://telegram.dog/wudixh13/4")
-        ]]
-    
+        InlineKeyboardButton('Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ🔎', switch_inline_query_current_chat=query),
+        InlineKeyboardButton('Sʜᴀʀᴇ ʙᴏᴛ💕', url=url)
+    ], [
+        InlineKeyboardButton('Dᴇᴠᴇʟᴏᴘᴇʀ😎', url=f"https://telegram.dog/wudixh13/4")
+    ]]
     return InlineKeyboardMarkup(buttons)
 
 
 def size_formatter(size):
     """Get size in readable format"""
-
     units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB"]
     size = float(size)
     i = 0
@@ -127,5 +123,4 @@ async def is_subscribed(bot, query):
     else:
         if not user.status == 'kicked':
             return True
-
     return False
