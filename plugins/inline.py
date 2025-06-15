@@ -50,13 +50,19 @@ async def answer(bot, query):
         "Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬\\- ||@wudixh||"
     )
 
+    description = (
+        f"Size: {size_formatter(file.file_size)}\n"
+        f"Type: {file.file_type}\n"
+        "© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™"
+    )
+
     results.append(
         InlineQueryResultCachedDocument(
             title=file.file_name,
             document_file_id=file.file_id,
             caption=caption,
-            parse_mode="MarkdownV2",  # ✅ Important
-            description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™",
+            parse_mode="MarkdownV2",
+            description=description,
             reply_markup=reply_markup
         )
     )
