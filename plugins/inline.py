@@ -50,18 +50,13 @@ async def answer(bot, query):
             "Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬\\- \\|\\|@wudixh\\|\\|"
         )
 
-        description = escape_markdown(
-            f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\nKᴜᴛᴛᴜ Bᴏᴛ 2 ™",
-            version=2
-        )
-
         results.append(
             InlineQueryResultCachedDocument(
                 title=file.file_name,
                 document_file_id=file.file_id,
                 caption=caption,
-                parse_mode="MarkdownV2",  # Important!
-                description=description,
+                parse_mode="MarkdownV2",
+                description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™",
                 reply_markup=reply_markup
             )
         )
@@ -93,12 +88,15 @@ async def answer(bot, query):
 
 def get_reply_markup(username, query):
     url = 't.me/share/url?url=' + quote(SHARE_BUTTON_TEXT.format(username=username))
-    buttons = [[
-        InlineKeyboardButton('Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ🔎', switch_inline_query_current_chat=query),
-        InlineKeyboardButton('Sʜᴀʀᴇ ʙᴏᴛ💕', url=url)
-    ], [
-        InlineKeyboardButton('Dᴇᴠᴇʟᴏᴘᴇʀ😎', url=f"https://telegram.dog/wudixh13/4")
-    ]]
+    buttons = [
+        [
+            InlineKeyboardButton('Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ🔎', switch_inline_query_current_chat=query),
+            InlineKeyboardButton('Sʜᴀʀᴇ ʙᴏᴛ💕', url=url)
+        ],
+        [
+            InlineKeyboardButton('Dᴇᴠᴇʟᴏᴘᴇʀ😎', url="https://telegram.dog/wudixh13/4")
+        ]
+    ]
     return InlineKeyboardMarkup(buttons)
 
 
