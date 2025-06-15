@@ -40,60 +40,41 @@ async def answer(bot, query):
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
     for file in files:
-        safe_file_name = file.file_name[:100]  # Limit file name length
-        safe_type = (file.file_type or "")[:50]  # Limit type length
+        safe_name = escape_html(file.file_name[:100])
+        safe_size = escape_html(size_formatter(file.file_size))
+        safe_type = escape_html((file.file_type or "")[:50])
 
-        caption = (
-            "<b>| Kuttu Bot 2 ™ |</b>\n"
-            f"📁 <b>File Name:</b> {escape_html(safe_file_name)}\n"
-            f"📦 <b>File Size:</b> {escape_html(size_formatter(file.file_size))}\n\n"
+        caption_body = (
+            f"📁 <b>File Name:</b> {safe_name}\n"
+            f"📦 <b>File Size:</b> {safe_size}\n\n"
             "Free Movie Group 🎬 <a href='https://t.me/wudixh'>@wudixh</a>"
         )
 
-        # Ensure caption fits within Telegram limits
-        if len(caption) > 1024:
-            caption = caption[:1020] + "..."
+        caption = f"<b>| Kuttu Bot 2 ™ |</b>\n{caption_body}"
 
-        description = (
-            f"Size: {size_formatter(file.file_size)}\n"
-            f"Type: {safe_type}\n"
-            "© Kuttu Bot 2 ™"
-        )
+        if len(caption) > 1024:
+            # Safely truncate body text (before tags)
+            caption_body = caption_body[:1000]
+            caption = f"<b>| Kuttu Bot 2 ™ |</b>\n{caption_body}"
 
         results.append(
             InlineQueryResultCachedDocument(
-                title=safe_file_name,
+                title=file.file_name[:64],  # Telegram title limit
                 document_file_id=file.file_id,
                 caption=caption,
                 parse_mode=ParseMode.HTML,
-                description=description,
+                description=f"Size: {size_formatter(file.file_size)} | Type: {safe_type}",
                 reply_markup=reply_markup
             )
         )
 
-    if results:
-        switch_pm_text = "📁Results📁"
-        if text:
-            switch_pm_text += f" for {text}"
-
-        await query.answer(
-            results=results,
-            cache_time=cache_time,
-            switch_pm_text=switch_pm_text,
-            switch_pm_parameter="start",
-            next_offset=str(next_offset)
-        )
-    else:
-        switch_pm_text = "❌No Results❌"
-        if text:
-            switch_pm_text += f' for "{text}"'
-
-        await query.answer(
-            results=[],
-            cache_time=cache_time,
-            switch_pm_text=switch_pm_text,
-            switch_pm_parameter="okay",
-        )
+    await query.answer(
+        results=results or [],
+        cache_time=cache_time,
+        switch_pm_text="📁Results📁" if results else "❌No Results❌",
+        switch_pm_parameter="start" if results else "okay",
+        next_offset=str(next_offset) if results else ""
+    )
 
 
 def get_reply_markup(username, query):
@@ -134,10 +115,9 @@ async def is_subscribed(bot, query):
     try:
         user = await bot.get_chat_member(AUTH_CHANNEL, query.from_user.id)
     except UserNotParticipant:
-        pass
+        return False
     except Exception as e:
         logger.exception(e)
+        return False
     else:
-        if user.status != 'kicked':
-            return True
-    return False
+        return user.status != 'kicked'
