@@ -40,20 +40,33 @@ async def answer(bot, query):
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
     for file in files:
+        safe_file_name = file.file_name[:100]  # Limit file name length
+        safe_type = (file.file_type or "")[:50]  # Limit type length
+
         caption = (
             "<b>| Kuttu Bot 2 ™ |</b>\n"
-            f"📁 <b>File Name:</b> {escape_html(file.file_name)}\n"
+            f"📁 <b>File Name:</b> {escape_html(safe_file_name)}\n"
             f"📦 <b>File Size:</b> {escape_html(size_formatter(file.file_size))}\n\n"
             "Free Movie Group 🎬 <a href='https://t.me/wudixh'>@wudixh</a>"
         )
 
+        # Ensure caption fits within Telegram limits
+        if len(caption) > 1024:
+            caption = caption[:1020] + "..."
+
+        description = (
+            f"Size: {size_formatter(file.file_size)}\n"
+            f"Type: {safe_type}\n"
+            "© Kuttu Bot 2 ™"
+        )
+
         results.append(
             InlineQueryResultCachedDocument(
-                title=file.file_name,
+                title=safe_file_name,
                 document_file_id=file.file_id,
                 caption=caption,
-                parse_mode="HTML",
-                description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kuttu Bot 2 ™",
+                parse_mode=ParseMode.HTML,
+                description=description,
                 reply_markup=reply_markup
             )
         )
