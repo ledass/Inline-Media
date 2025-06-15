@@ -44,17 +44,26 @@ async def answer(bot, query):
         return ''.join(f"\\{c}" if c in escape_chars else c for c in text)
         
     for file in files:
-        escaped_filename = 
-        escape_markdown_v2(file.file_name)
-        escaped_size =
-        escape_markdown_v2(size_formatter(file.file_size))
+        escaped_filename = escape_markdown_v2(file.file_name)
+        escaped_size = escape_markdown_v2(size_formatter(file.file_size))
+    
+    caption = (
+        "*| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |*\n"
+        f"📁 *Fɪʟᴇ Nᴀᴍᴇ:* {escaped_filename}\n"
+        f"📽 *Fɪʟᴇ Sɪᴢᴇ:* {escaped_size}\n\n"
+        "Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬\\- \\|\\|@wudixh\\|\\|"
+    )
 
-        caption = (
-            "*| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |*\n"
-            f"📁 *Fɪʟᴇ Nᴀᴍᴇ:* {escaped_filename}\n"
-            f"📽 *Fɪʟᴇ Sɪᴢᴇ:* {escaped_size}\n\n"
-            "Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬\\- \\|\\|@wudixh\\|\\|"
+    results.append(
+        InlineQueryResultCachedDocument(
+            title=file.file_name,
+            document_file_id=file.file_id,
+            caption=caption,
+            parse_mode="MarkdownV2",
+            description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™",
+            reply_markup=reply_markup
         )
+    )
 
         results.append(
             InlineQueryResultCachedDocument(
