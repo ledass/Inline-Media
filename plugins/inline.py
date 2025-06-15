@@ -5,7 +5,6 @@ from pyrogram import Client, emoji, filters
 from pyrogram.errors import UserNotParticipant
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultCachedDocument
 from pyrogram.enums import ParseMode
-from pyrogram.utils import escape_markdown
 
 from utils import get_search_results
 from info import CACHE_TIME, SHARE_BUTTON_TEXT, AUTH_USERS, AUTH_CHANNEL
@@ -40,15 +39,15 @@ async def answer(bot, query):
     reply_markup = get_reply_markup(bot.username, query=text)
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
+    def escape_markdown_v2(text):
+        escape_chars = r"\_*[]()~`>#+-=|{}.!"
+        return ''.join(f"\\{c}" if c in escape_chars else c for c in text)
+        
     for file in files:
-        escaped_filename = escape_markdown(
-            file.file_name,
-            version=2
-        )
-        escaped_size = escape_markdown(
-            size_formatter(file.file_size),
-            version=2
-        )
+        escaped_filename = 
+        escape_markdown_v2(file.file_name)
+        escaped_size =
+        escape_markdown_v2(size_formatter(file.file_size))
 
         caption = (
             "*| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |*\n"
