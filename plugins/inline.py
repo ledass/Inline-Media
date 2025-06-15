@@ -4,6 +4,7 @@ from urllib.parse import quote
 from pyrogram import Client, emoji, filters
 from pyrogram.errors import UserNotParticipant
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultCachedDocument
+from pyrogram.helpers import escape_markdown
 
 from utils import get_search_results
 from info import CACHE_TIME, SHARE_BUTTON_TEXT, AUTH_USERS, AUTH_CHANNEL
@@ -39,16 +40,26 @@ async def answer(bot, query):
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
     for file in files:
-        results.append(
-            InlineQueryResultCachedDocument(
-                title=file.file_name,
-                document_file_id=file.file_id,
-                caption= f"| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |\n📁 Fɪʟᴇ Nᴀᴍᴇ: {file.file_name} \n\n| 📽 Fɪʟᴇ Sɪᴢᴇ: {size_formatter(file.file_size)} | \n\n Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬- ||@wudixh||" ,
-                description=f'Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™',
-                reply_markup=reply_markup
-            )
-        )
+    escaped_filename = escape_markdown(file.file_name, version=2)
+    escaped_size = escape_markdown(size_formatter(file.file_size), version=2)
 
+    caption = (
+        "*| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |*\n"
+        f"📁 *Fɪʟᴇ Nᴀᴍᴇ:* {escaped_filename}\n\n"
+        f"📽 *Fɪʟᴇ Sɪᴢᴇ:* {escaped_size}\n\n"
+        "Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬\\- ||@wudixh||"
+    )
+
+    results.append(
+        InlineQueryResultCachedDocument(
+            title=file.file_name,
+            document_file_id=file.file_id,
+            caption=caption,
+            parse_mode="MarkdownV2",  # ✅ Important
+            description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™",
+            reply_markup=reply_markup
+        )
+    )
     if results:
         switch_pm_text = f"📁Rᴇsᴜʟᴛz📁"
         if text:
