@@ -1,10 +1,9 @@
 import logging
 from urllib.parse import quote
 
-from pyrogram import Client, emoji, filters
+from pyrogram import Client, filters
 from pyrogram.errors import UserNotParticipant
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultCachedDocument
-from pyrogram.enums import ParseMode
 
 from utils import get_search_results
 from info import CACHE_TIME, SHARE_BUTTON_TEXT, AUTH_USERS, AUTH_CHANNEL
@@ -39,38 +38,23 @@ async def answer(bot, query):
     reply_markup = get_reply_markup(bot.username, query=text)
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
-    def escape_markdown_v2(text):
-    escape_chars = r"_\*[]()~`>#+-=|{}.!"
-    return ''.join(f"\\{c}" if c in escape_chars else c for c in text)
+    for file in files:
+        escaped_filename = escape_markdown_v2(file.file_name)
+        escaped_size = escape_markdown_v2(size_formatter(file.file_size))
 
-for file in files:
-    escaped_filename = escape_markdown_v2(file.file_name)
-    escaped_size = escape_markdown_v2(size_formatter(file.file_size))
-
-    caption = (
-        "*| Kuttu Bot 2 ™ |*\n"
-        f"📁 *File Name:* {escaped_filename}\n"
-        f"📦 *File Size:* {escaped_size}\n\n"
-        "Free Movie Group 🎬 \\- \\|\\|\\|@wudixh\\|\\|\\|"
-    )
-
-    results.append(
-        InlineQueryResultCachedDocument(
-            title=file.file_name,
-            document_file_id=file.file_id,
-            caption=caption,
-            parse_mode="MarkdownV2",
-            description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™",
-            reply_markup=reply_markup
+        caption = (
+            "*| Kuttu Bot 2 ™ |*\n"
+            f"📁 *File Name:* {escaped_filename}\n"
+            f"📦 *File Size:* {escaped_size}\n\n"
+            "Free Movie Group 🎬 \\- \\|\\|\\|@wudixh\\|\\|\\|"
         )
-    )
 
         results.append(
             InlineQueryResultCachedDocument(
                 title=file.file_name,
                 document_file_id=file.file_id,
                 caption=caption,
-                parse_mode="MarkdownV2",  # ✅ Important
+                parse_mode="MarkdownV2",
                 description=f"Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™",
                 reply_markup=reply_markup
             )
@@ -120,10 +104,16 @@ def size_formatter(size):
     units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB"]
     size = float(size)
     i = 0
-    while size >= 1024.0 and i < len(units):
+    while size >= 1024.0 and i < len(units) - 1:
         i += 1
         size /= 1024.0
     return "%.2f %s" % (size, units[i])
+
+
+def escape_markdown_v2(text):
+    """Escape characters for MarkdownV2"""
+    escape_chars = r"_\*[]()~`>#+-=|{}.! "
+    return ''.join(f"\\{c}" if c in escape_chars else c for c in text)
 
 
 async def is_subscribed(bot, query):
