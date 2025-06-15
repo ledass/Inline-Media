@@ -113,7 +113,7 @@ async def start(bot, message):
     else:
         nyva=BOT.get("username")
         if not nyva:
-            botusername=await client.get_me()
+            botusername = await bot.get_me()
             MC_EMPURAAN_BOT=botusername.username
             BOT["username"]=MC_EMPURAAN_BOT
         # Typing effect
