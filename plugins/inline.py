@@ -40,18 +40,18 @@ async def answer(bot, query):
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
     def escape_markdown_v2(text):
-        escape_chars = r"\_*[]()~`>#+-=|{}.!"
-        return ''.join(f"\\{c}" if c in escape_chars else c for c in text)
-        
-    for file in files:
-        escaped_filename = escape_markdown_v2(file.file_name)
-        escaped_size = escape_markdown_v2(size_formatter(file.file_size))
-    
+    escape_chars = r"_\*[]()~`>#+-=|{}.!"
+    return ''.join(f"\\{c}" if c in escape_chars else c for c in text)
+
+for file in files:
+    escaped_filename = escape_markdown_v2(file.file_name)
+    escaped_size = escape_markdown_v2(size_formatter(file.file_size))
+
     caption = (
-        "*| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |*\n"
-        f"📁 *Fɪʟᴇ Nᴀᴍᴇ:* {escaped_filename}\n"
-        f"📽 *Fɪʟᴇ Sɪᴢᴇ:* {escaped_size}\n\n"
-        "Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬\\- \\|\\|@wudixh\\|\\|"
+        "*| Kuttu Bot 2 ™ |*\n"
+        f"📁 *File Name:* {escaped_filename}\n"
+        f"📦 *File Size:* {escaped_size}\n\n"
+        "Free Movie Group 🎬 \\- \\|\\|\\|@wudixh\\|\\|\\|"
     )
 
     results.append(
