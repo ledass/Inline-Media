@@ -39,9 +39,10 @@ async def answer(bot, query):
     reply_markup = get_reply_markup(bot.username, query=text)
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
-    for file in files:
-    escaped_filename = escape_markdown(file.file_name, version=2)
-    escaped_size = escape_markdown(size_formatter(file.file_size), version=2)
+    
+   for file in files:
+       escaped_filename = escape_markdown(file.file_name, version=2)
+       escaped_size = escape_markdown(size_formatter(file.file_size), version=2)
 
     caption = (
         "*| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |*\n"
