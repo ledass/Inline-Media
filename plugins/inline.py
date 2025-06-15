@@ -1,10 +1,9 @@
 import logging
 from urllib.parse import quote
 
-from pyrogram import Client, filters
+from pyrogram import Client, emoji, filters
 from pyrogram.errors import UserNotParticipant
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultCachedDocument
-from pyrogram.enums import ParseMode
 
 from utils import get_search_results
 from info import CACHE_TIME, SHARE_BUTTON_TEXT, AUTH_USERS, AUTH_CHANNEL
@@ -21,8 +20,8 @@ async def answer(bot, query):
         await query.answer(
             results=[],
             cache_time=0,
-            switch_pm_text='You have to subscribe the channel ✔',
-            switch_pm_parameter="subscribe",
+            switch_pm_text='Yᴏᴜ Hᴀᴠᴇ Tᴏ SᴜʙSᴄʀɪʙᴇ Cʜᴀɴɴᴇʟ...✔',
+            switch_pm_parameter="Sᴜʙsᴄʀɪʙᴇ...💖",
         )
         return
 
@@ -40,84 +39,75 @@ async def answer(bot, query):
     files, next_offset = await get_search_results(text, file_type=file_type, max_results=10, offset=offset)
 
     for file in files:
-        safe_name = escape_html(file.file_name[:100])
-        safe_size = escape_html(size_formatter(file.file_size))
-        safe_type = escape_html((file.file_type or "")[:50])
-
-        caption_body = (
-            f"📁 <b>File Name:</b> {safe_name}\n"
-            f"📦 <b>File Size:</b> {safe_size}\n\n"
-            "Free Movie Group 🎬 <a href='https://t.me/wudixh'>@wudixh</a>"
-        )
-
-        caption = f"<b>| Kuttu Bot 2 ™ |</b>\n{caption_body}"
-
-        if len(caption) > 1024:
-            # Safely truncate body text (before tags)
-            caption_body = caption_body[:1000]
-            caption = f"<b>| Kuttu Bot 2 ™ |</b>\n{caption_body}"
-
         results.append(
             InlineQueryResultCachedDocument(
-                title=file.file_name[:64],  # Telegram title limit
+                title=file.file_name,
                 document_file_id=file.file_id,
-                caption=caption,
-                parse_mode=ParseMode.HTML,
-                description=f"Size: {size_formatter(file.file_size)} | Type: {safe_type}",
+                caption= f"| Kᴜᴛᴛᴜ Bᴏᴛ 2 ™ |\n📁 Fɪʟᴇ Nᴀᴍᴇ: {file.file_name} \n\n| 📽 Fɪʟᴇ Sɪᴢᴇ: {size_formatter(file.file_size)} | \n\n Fʀᴇᴇ Mᴏᴠɪᴇ Gʀᴏᴜᴘ 🎬- ||@wudixh||" ,
+                description=f'Size: {size_formatter(file.file_size)}\nType: {file.file_type}\n© Kᴜᴛᴛᴜ Bᴏᴛ 2 ™',
                 reply_markup=reply_markup
             )
         )
 
-    await query.answer(
-        results=results or [],
-        cache_time=cache_time,
-        switch_pm_text="📁Results📁" if results else "❌No Results❌",
-        switch_pm_parameter="start" if results else "okay",
-        next_offset=str(next_offset) if results else ""
-    )
+    if results:
+        switch_pm_text = f"📁Rᴇsᴜʟᴛz📁"
+        if text:
+            switch_pm_text += f" for {text}"
+
+        await query.answer(
+            results=results,
+            cache_time=cache_time,
+            switch_pm_text=switch_pm_text,
+            switch_pm_parameter="start",
+            next_offset=str(next_offset)
+        )
+    else:
+
+        switch_pm_text = f"❌No Rᴇsᴜʟᴛz❌"
+        if text:
+            switch_pm_text += f' for "{text}"'
+
+        await query.answer(
+            results=[],
+            cache_time=cache_time,
+            switch_pm_text=switch_pm_text,
+            switch_pm_parameter="okay",
+        )
 
 
 def get_reply_markup(username, query):
-    url = 'https://t.me/share/url?url=' + quote(SHARE_BUTTON_TEXT.format(username=username))
-    buttons = [
-        [
-            InlineKeyboardButton('Search again 🔎', switch_inline_query_current_chat=query),
-            InlineKeyboardButton('Share bot 💕', url=url)
-        ],
-        [
-            InlineKeyboardButton('Developer 😎', url="https://telegram.dog/wudixh13/4")
-        ]
-    ]
+    url = 't.me/share/url?url=' + quote(SHARE_BUTTON_TEXT.format(username=username))
+    buttons = [[
+            InlineKeyboardButton('Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ🔎', switch_inline_query_current_chat=query),
+            InlineKeyboardButton('Sʜᴀʀᴇ ʙᴏᴛ💕', url=url)
+        ],[
+            InlineKeyboardButton('Dᴇᴠᴇʟᴏᴘᴇʀ😎', url=f"https://telegram.dog/wudixh13/4")
+        ]]
+    
     return InlineKeyboardMarkup(buttons)
 
 
 def size_formatter(size):
     """Get size in readable format"""
+
     units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB"]
     size = float(size)
     i = 0
-    while size >= 1024.0 and i < len(units) - 1:
+    while size >= 1024.0 and i < len(units):
         i += 1
         size /= 1024.0
     return "%.2f %s" % (size, units[i])
-
-
-def escape_html(text):
-    """Escape characters for HTML"""
-    return (text
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-            )
 
 
 async def is_subscribed(bot, query):
     try:
         user = await bot.get_chat_member(AUTH_CHANNEL, query.from_user.id)
     except UserNotParticipant:
-        return False
+        pass
     except Exception as e:
         logger.exception(e)
-        return False
     else:
-        return user.status != 'kicked'
+        if not user.status == 'kicked':
+            return True
+
+    return False
