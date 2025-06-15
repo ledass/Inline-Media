@@ -114,8 +114,8 @@ async def start(bot, message):
         nyva=BOT.get("username")
         if not nyva:
             botusername=await client.get_me()
-            nyva=botusername.username
-            BOT["username"]=nyva
+            MC_EMPURAAN_BOT=botusername.username
+            BOT["username"]=MC_EMPURAAN_BOT
         # Typing effect
         emo = await message.reply_text("👀")
         await asyncio.sleep(1.1)
